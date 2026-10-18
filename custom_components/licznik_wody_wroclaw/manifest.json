@@ -8,10 +8,10 @@
   "dependencies": [
     "recorder"
   ],
-  "documentation": "https://github.com/MaciekWro/ha-mpwik-wroclaw",
+  "documentation": "https://github.com/MaciekWro/ha-licznikwody-wroclaw",
   "integration_type": "service",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/MaciekWro/ha-mpwik-wroclaw/issues",
+  "issue_tracker": "https://github.com/MaciekWro/ha-licznikwody-wroclaw/issues",
   "requirements": [],
   "version": "0.5.0"
 }
