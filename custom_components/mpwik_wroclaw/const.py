@@ -21,3 +21,6 @@ FETCH_INTERVAL = timedelta(hours=1)
 DATA_DELAY_DAYS = 7
 
 TIMEZONE = "Europe/Warsaw"
+
+# Sensory z wcześniejszych wersji, usuwane z rejestru encji przy starcie.
+REMOVED_SENSOR_KEYS = ("zuzycie_dobowe", "zuzycie_ostatniej_godziny")

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import timedelta
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -14,12 +15,13 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import UnitOfVolume
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import MpwikConfigEntry
-from .const import CONF_ADRES, DOMAIN
+from .const import CONF_ADRES, DOMAIN, REMOVED_SENSOR_KEYS
 from .coordinator import MpwikCoordinator, MpwikData
 
 
@@ -41,29 +43,31 @@ SENSORS: tuple[MpwikSensorDescription, ...] = (
         attrs_fn=lambda d: {"czas_odczytu": d.stan_wodomierza_czas, "licznik": d.licznik},
     ),
     MpwikSensorDescription(
-        key="zuzycie_dobowe",
-        translation_key="zuzycie_dobowe",
+        key="zuzycie_dzienne",
+        translation_key="zuzycie_dzienne",
         device_class=SensorDeviceClass.WATER,
         native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
         suggested_display_precision=3,
-        value_fn=lambda d: d.zuzycie_dobowe,
-        attrs_fn=lambda d: {"dzien": d.zuzycie_dobowe_dzien},
+        value_fn=lambda d: d.zuzycie_dzienne,
+        attrs_fn=lambda d: {"dzien": d.zuzycie_dzienne_dzien, "do_godziny": d.ostatnia_godzina},
     ),
     MpwikSensorDescription(
-        key="zuzycie_ostatniej_godziny",
-        translation_key="zuzycie_ostatniej_godziny",
+        key="zuzycie_godzinowe",
+        translation_key="zuzycie_godzinowe",
         device_class=SensorDeviceClass.WATER,
         native_unit_of_measurement=UnitOfVolume.CUBIC_METERS,
         suggested_display_precision=3,
-        value_fn=lambda d: d.zuzycie_ostatniej_godziny,
-        attrs_fn=lambda d: {"koniec_godziny": d.ostatnia_godzina},
+        value_fn=lambda d: d.zuzycie_godzinowe,
+        attrs_fn=lambda d: {
+            "od": d.ostatnia_godzina - timedelta(hours=1) if d.ostatnia_godzina else None,
+            "do": d.ostatnia_godzina,
+        },
     ),
     MpwikSensorDescription(
         key="ostatnia_godzina",
         translation_key="ostatnia_godzina",
-        device_class=SensorDeviceClass.DATE,
-        value_fn=lambda d: d.ostatni_dzien,
-        attrs_fn=lambda d: {"koniec_ostatniej_godziny": d.ostatnia_godzina},
+        device_class=SensorDeviceClass.TIMESTAMP,
+        value_fn=lambda d: d.ostatnia_godzina,
     ),
 )
 
@@ -74,6 +78,11 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     coordinator = entry.runtime_data
+    registry = er.async_get(hass)
+    base_id = f"{coordinator.podmiot}_{coordinator.punkt}"
+    for key in REMOVED_SENSOR_KEYS:
+        if entity_id := registry.async_get_entity_id("sensor", DOMAIN, f"{base_id}_{key}"):
+            registry.async_remove(entity_id)
     async_add_entities(MpwikSensor(coordinator, description) for description in SENSORS)
 
 

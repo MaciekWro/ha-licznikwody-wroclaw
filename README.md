@@ -1,4 +1,4 @@
-# MPWiK Wrocław (eBOK) dla Home Assistant
+# Licznik wody Wrocław – integracja Home Assistant
 
 <img src="custom_components/mpwik_wroclaw/brand/icon.png" width="96" alt="Ikona">
 
@@ -12,9 +12,10 @@ Dzięki temu dane da się pokazać w panelu **Energia → Zużycie wody**.
   pod właściwą godzinę, mimo że eBOK publikuje dane z 2–3 dniowym opóźnieniem.
 - Sensory:
   - *Stan wodomierza* (m³, `total_increasing`)
-  - *Zużycie dobowe* za ostatnią pełną dobę z danymi godzinowymi (doba eBOK: 23:00–23:00)
-  - *Zużycie w ostatniej godzinie z danymi*
-  - *Ostatni odczyt godzinowy* – data ostatniego dnia z danymi (godzina w atrybucie)
+  - *Ostatni odczyt godzinowy* – data i godzina ostatniego odczytu (koniec godziny)
+  - *Dzienne zużycie wody* – suma zużycia w dniu ostatniego odczytu, do jego godziny
+    (doba liczona jak w eBOK: od 23:00 dnia poprzedniego)
+  - *Godzinowe zużycie wody* – zużycie w godzinie ostatniego odczytu
 
 ## Ważne: logowanie
 
@@ -36,8 +37,8 @@ uwierzytelnieniu i wystarczy wkleić nowe ciasteczko.
 ## Instalacja (HACS)
 
 1. HACS → menu ⋮ → *Custom repositories* → dodaj adres tego repozytorium, kategoria **Integration**.
-2. Zainstaluj „MPWiK Wrocław (eBOK)” i zrestartuj Home Assistant.
-3. *Ustawienia → Urządzenia i usługi → Dodaj integrację → MPWiK Wrocław*.
+2. Zainstaluj „Licznik wody Wrocław” i zrestartuj Home Assistant.
+3. *Ustawienia → Urządzenia i usługi → Dodaj integrację → Licznik wody Wrocław*.
 4. Podaj **kod podmiotu** (liczba z parametru `?p=` w adresie eBOK), nagłówek `Cookie` oraz liczbę dni historii do pobrania.
 5. Wybierz punkt sieci (wodomierz).
 6. *Ustawienia → Panele → Energia → Zużycie wody → Dodaj źródło wody* i wybierz statystykę **MPWiK …**.
@@ -61,6 +62,8 @@ Ikona leży w `custom_components/mpwik_wroclaw/brand/` (nowsze wersje HA wczytuj
 
 ## Historia zmian
 
+- **0.3.0** – nazwa „Licznik wody Wrocław”; „Ostatni odczyt godzinowy” pokazuje datę i godzinę;
+  nowe encje „Dzienne zużycie wody” i „Godzinowe zużycie wody” (zastępują dwie poprzednie encje zużycia).
 - **0.2.0** – ikona integracji, producent urządzenia „ML”; zużycie dobowe liczone z danych godzinowych
   (ostatnia pełna doba 23:00–23:00, wcześniej bywało 0); „Ostatni odczyt godzinowy” pokazuje datę ostatniego dnia z danymi.
 - **0.1.0** – pierwsza wersja.

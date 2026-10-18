@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "MPWiK Wrocław (eBOK)",
+        "title": "Licznik wody Wrocław",
         "description": "eBOK login requires reCAPTCHA, so this integration uses a browser session. Log in at ebok.mpwik.wroc.pl, open developer tools (F12) → Network, select any request to frontend-api and copy the full value of the Cookie request header.",
         "data": {
           "podmiot": "Customer code",
@@ -16,12 +16,16 @@
       },
       "punkt": {
         "title": "Select service point",
-        "data": { "punkt": "Service point" }
+        "data": {
+          "punkt": "Service point"
+        }
       },
       "reauth_confirm": {
         "title": "eBOK session expired",
         "description": "Log in again in your browser and paste the new Cookie header.",
-        "data": { "cookie": "Cookie header" }
+        "data": {
+          "cookie": "Cookie header"
+        }
       }
     },
     "error": {
@@ -36,10 +40,18 @@
   },
   "entity": {
     "sensor": {
-      "stan_wodomierza": { "name": "Meter reading" },
-      "zuzycie_dobowe": { "name": "Daily usage (latest full day)" },
-      "zuzycie_ostatniej_godziny": { "name": "Usage in latest hour with data" },
-      "ostatnia_godzina": { "name": "Latest hourly reading" }
+      "stan_wodomierza": {
+        "name": "Meter reading"
+      },
+      "zuzycie_dzienne": {
+        "name": "Daily water usage"
+      },
+      "zuzycie_godzinowe": {
+        "name": "Hourly water usage"
+      },
+      "ostatnia_godzina": {
+        "name": "Latest hourly reading"
+      }
     }
   }
 }

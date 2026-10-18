@@ -53,11 +53,12 @@ class MpwikData:
 
     stan_wodomierza: float | None = None
     stan_wodomierza_czas: datetime | None = None
-    zuzycie_dobowe: float | None = None
-    zuzycie_dobowe_dzien: date | None = None
-    ostatni_dzien: date | None = None
+    # koniec godziny ostatniego odczytu i zużycie w tej godzinie
     ostatnia_godzina: datetime | None = None
-    zuzycie_ostatniej_godziny: float | None = None
+    zuzycie_godzinowe: float | None = None
+    # zużycie od początku doby (eBOK: od 23:00 dnia poprzedniego) do ostatniego odczytu
+    zuzycie_dzienne: float | None = None
+    zuzycie_dzienne_dzien: date | None = None
     licznik: str | None = None
 
 
@@ -113,9 +114,9 @@ class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
     async def _import_hourly(self, today: date) -> None:
         """Dopisuje nowe godziny do statystyk zewnętrznych (panel Energia -> Woda).
 
-        Przy okazji aktualizuje wartości sensorów. Zużycie dobowe liczymy z odczytów
-        godzinowych, bo ostatni wpis endpointu dobowego bywa zerowy, dopóki nie dotrą
-        dane godzinowe. Doba w eBOK trwa od 23:00 dnia poprzedniego do 23:00.
+        Przy okazji aktualizuje wartości sensorów. Zużycie dzienne liczymy z odczytów
+        godzinowych (do godziny ostatniego odczytu), bo ostatni wpis endpointu dobowego
+        bywa zerowy. Doba w eBOK trwa od 23:00 dnia poprzedniego do 23:00.
         """
         last = await get_instance(self.hass).async_add_executor_job(
             get_last_statistics, self.hass, 1, self.statistic_id, True, {"sum"}
@@ -123,7 +124,7 @@ class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
         if rows := last.get(self.statistic_id):
             last_start: datetime | None = dt_util.utc_from_timestamp(rows[0]["start"])
             total = rows[0]["sum"] or 0.0
-            # o dzień wcześniej, żeby po restarcie odtworzyć ostatnią pełną dobę
+            # o dzień wcześniej, żeby po restarcie odtworzyć zużycie dzienne
             day = (last_start + timedelta(hours=1)).astimezone(_TZ).date() - timedelta(days=1)
         else:
             last_start = None
@@ -138,14 +139,10 @@ class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
             if not odczyty and (today - day).days < DATA_DELAY_DAYS:
                 break  # dane z tego dnia jeszcze nie dotarły - spróbujemy później
             # pierwszy odczyt to 23:00 dnia poprzedniego - należy do poprzedniej doby
-            doba = [o for o in odczyty if o.data.date() == day]
+            doba = [o for o in odczyty if o.data.date() == day and o.zuzycie is not None]
             if doba:
-                self._data.ostatni_dzien = day
-                if any(o.data.hour == 23 for o in doba):  # doba pełna (do 23:00)
-                    self._data.zuzycie_dobowe = round(
-                        sum(o.zuzycie for o in doba if o.zuzycie is not None), 3
-                    )
-                    self._data.zuzycie_dobowe_dzien = day
+                self._data.zuzycie_dzienne = round(sum(o.zuzycie for o in doba), 3)
+                self._data.zuzycie_dzienne_dzien = day
             for o in odczyty:
                 end = _to_utc(o.data)
                 if prev_end and end <= prev_end:
@@ -157,7 +154,7 @@ class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
                 if o.zuzycie is None:
                     continue
                 self._data.ostatnia_godzina = end
-                self._data.zuzycie_ostatniej_godziny = o.zuzycie
+                self._data.zuzycie_godzinowe = o.zuzycie
                 self._data.licznik = o.licznik or self._data.licznik
                 if o.wskazanie is not None:
                     self._data.stan_wodomierza = o.wskazanie

@@ -2,7 +2,7 @@
   "config": {
     "step": {
       "user": {
-        "title": "MPWiK Wrocław (eBOK)",
+        "title": "Licznik wody Wrocław",
         "description": "Logowanie do eBOK wymaga reCAPTCHA, dlatego integracja używa sesji z przeglądarki. Zaloguj się na ebok.mpwik.wroc.pl, otwórz narzędzia deweloperskie (F12) → Sieć, kliknij dowolne zapytanie do frontend-api i skopiuj całą wartość nagłówka Cookie.",
         "data": {
           "podmiot": "Kod podmiotu",
@@ -16,12 +16,16 @@
       },
       "punkt": {
         "title": "Wybierz punkt sieci",
-        "data": { "punkt": "Punkt sieci" }
+        "data": {
+          "punkt": "Punkt sieci"
+        }
       },
       "reauth_confirm": {
         "title": "Sesja eBOK wygasła",
         "description": "Zaloguj się ponownie w przeglądarce i wklej nowy nagłówek Cookie.",
-        "data": { "cookie": "Nagłówek Cookie" }
+        "data": {
+          "cookie": "Nagłówek Cookie"
+        }
       }
     },
     "error": {
@@ -36,10 +40,18 @@
   },
   "entity": {
     "sensor": {
-      "stan_wodomierza": { "name": "Stan wodomierza" },
-      "zuzycie_dobowe": { "name": "Zużycie dobowe (ostatnia pełna doba)" },
-      "zuzycie_ostatniej_godziny": { "name": "Zużycie w ostatniej godzinie z danymi" },
-      "ostatnia_godzina": { "name": "Ostatni odczyt godzinowy" }
+      "stan_wodomierza": {
+        "name": "Stan wodomierza"
+      },
+      "zuzycie_dzienne": {
+        "name": "Dzienne zużycie wody"
+      },
+      "zuzycie_godzinowe": {
+        "name": "Godzinowe zużycie wody"
+      },
+      "ostatnia_godzina": {
+        "name": "Ostatni odczyt godzinowy"
+      }
     }
   }
 }
