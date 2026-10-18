@@ -28,7 +28,9 @@ loginem i hasłem. Używa sesji, którą zakładasz w przeglądarce:
    Muszą się w niej znaleźć co najmniej `JSESSIONID` i `SERVERG1`.
 4. Wklej ją podczas konfiguracji integracji.
 
-Integracja co 5 minut odpytuje `/session/info`, żeby sesja nie wygasła. Sesja przepada m.in. przy dłuższej
+Integracja co 5 minut odpytuje `/session/info`, żeby sesja nie wygasła. Odstęp zmienisz w
+*Ustawienia → Urządzenia i usługi → Licznik wody Wrocław → Konfiguruj* (1–30 min; sesja wygasa po ok. 45 min
+bez aktywności, więc zalecane 5–15). Sesja przepada m.in. przy dłuższej
 przerwie (np. wyłączony HA) albo po wylogowaniu w przeglądarce. Wtedy HA pokaże powiadomienie o ponownym
 uwierzytelnieniu i wystarczy wkleić nowe ciasteczko.
 > Nie klikaj „Wyloguj” w przeglądarce, z której skopiowałeś ciasteczko, bo to zakończy także sesję integracji.
@@ -62,6 +64,7 @@ Ikona leży w `custom_components/licznik_wody_wroclaw/brand/` (nowsze wersje HA 
 
 ## Historia zmian
 
+- **0.5.0** – odstęp podtrzymania sesji ustawiany w opcjach integracji (*Konfiguruj*).
 - **0.4.0** – identyfikator integracji zmieniony na `licznik_wody_wroclaw` (zmiana łamiąca zgodność):
   po aktualizacji usuń starą integrację, dodaj ją od nowa i wybierz nową statystykę w panelu Energia.
 - **0.3.0** – nazwa „Licznik wody Wrocław”; „Ostatni odczyt godzinowy” pokazuje datę i godzinę;

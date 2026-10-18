@@ -53,5 +53,18 @@
         "name": "Latest hourly reading"
       }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Options",
+        "data": {
+          "keepalive_minutes": "Session keep-alive interval (minutes)"
+        },
+        "data_description": {
+          "keepalive_minutes": "How often to ping eBOK so the session does not expire (it expires after ~45 min of inactivity). Recommended 5–15."
+        }
+      }
+    }
   }
 }

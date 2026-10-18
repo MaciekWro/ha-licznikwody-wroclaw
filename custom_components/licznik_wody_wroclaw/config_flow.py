@@ -8,7 +8,13 @@ from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import (
+    ConfigEntry,
+    ConfigFlow,
+    ConfigFlowResult,
+    OptionsFlowWithReload,
+)
+from homeassistant.core import callback
 from homeassistant.helpers.selector import (
     NumberSelector,
     NumberSelectorConfig,
@@ -26,11 +32,15 @@ from .const import (
     CONF_ADRES,
     CONF_BACKFILL_DAYS,
     CONF_COOKIE,
+    CONF_KEEPALIVE_MINUTES,
     CONF_PODMIOT,
     CONF_PUNKT,
     DEFAULT_BACKFILL_DAYS,
+    DEFAULT_KEEPALIVE_MINUTES,
     DOMAIN,
     MAX_BACKFILL_DAYS,
+    MAX_KEEPALIVE_MINUTES,
+    MIN_KEEPALIVE_MINUTES,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -40,6 +50,11 @@ _COOKIE_SELECTOR = TextSelector(TextSelectorConfig(multiline=True))
 
 class MpwikConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry) -> MpwikOptionsFlow:
+        return MpwikOptionsFlow()
 
     def __init__(self) -> None:
         self._user_input: dict[str, Any] = {}
@@ -137,4 +152,31 @@ class MpwikConfigFlow(ConfigFlow, domain=DOMAIN):
             step_id="reauth_confirm",
             data_schema=vol.Schema({vol.Required(CONF_COOKIE): _COOKIE_SELECTOR}),
             errors=errors,
+        )
+
+
+class MpwikOptionsFlow(OptionsFlowWithReload):
+    """Opcje: co ile minut podtrzymywać sesję eBOK."""
+
+    async def async_step_init(self, user_input: dict[str, Any] | None = None) -> ConfigFlowResult:
+        if user_input is not None:
+            return self.async_create_entry(
+                data={CONF_KEEPALIVE_MINUTES: int(user_input[CONF_KEEPALIVE_MINUTES])}
+            )
+        current = self.config_entry.options.get(CONF_KEEPALIVE_MINUTES, DEFAULT_KEEPALIVE_MINUTES)
+        return self.async_show_form(
+            step_id="init",
+            data_schema=vol.Schema(
+                {
+                    vol.Required(CONF_KEEPALIVE_MINUTES, default=current): NumberSelector(
+                        NumberSelectorConfig(
+                            min=MIN_KEEPALIVE_MINUTES,
+                            max=MAX_KEEPALIVE_MINUTES,
+                            step=1,
+                            mode=NumberSelectorMode.BOX,
+                            unit_of_measurement="min",
+                        )
+                    )
+                }
+            ),
         )

@@ -31,13 +31,14 @@ from .const import (
     CONF_ADRES,
     CONF_BACKFILL_DAYS,
     CONF_COOKIE,
+    CONF_KEEPALIVE_MINUTES,
     CONF_PODMIOT,
     CONF_PUNKT,
     DATA_DELAY_DAYS,
     DEFAULT_BACKFILL_DAYS,
+    DEFAULT_KEEPALIVE_MINUTES,
     DOMAIN,
     FETCH_INTERVAL,
-    KEEPALIVE_INTERVAL,
     TIMEZONE,
 )
 
@@ -63,7 +64,7 @@ class MpwikData:
 
 
 class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
-    """Co 5 min podtrzymuje sesję, co godzinę pobiera dane."""
+    """Co kilka minut (opcja integracji) podtrzymuje sesję, co godzinę pobiera dane."""
 
     config_entry: ConfigEntry
 
@@ -73,7 +74,9 @@ class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
             _LOGGER,
             config_entry=entry,
             name=DOMAIN,
-            update_interval=KEEPALIVE_INTERVAL,
+            update_interval=timedelta(
+                minutes=entry.options.get(CONF_KEEPALIVE_MINUTES, DEFAULT_KEEPALIVE_MINUTES)
+            ),
         )
         self.client = client
         self.podmiot: str = entry.data[CONF_PODMIOT]

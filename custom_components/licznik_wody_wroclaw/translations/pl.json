@@ -53,5 +53,18 @@
         "name": "Ostatni odczyt godzinowy"
       }
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Opcje",
+        "data": {
+          "keepalive_minutes": "Podtrzymanie sesji co (minuty)"
+        },
+        "data_description": {
+          "keepalive_minutes": "Co ile minut odpytywać eBOK, żeby sesja nie wygasła (wygasa po ok. 45 min bez aktywności). Zalecane 5–15."
+        }
+      }
+    }
   }
 }
