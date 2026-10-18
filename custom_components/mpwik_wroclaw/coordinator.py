@@ -55,6 +55,7 @@ class MpwikData:
     stan_wodomierza_czas: datetime | None = None
     zuzycie_dobowe: float | None = None
     zuzycie_dobowe_dzien: date | None = None
+    ostatni_dzien: date | None = None
     ostatnia_godzina: datetime | None = None
     zuzycie_ostatniej_godziny: float | None = None
     licznik: str | None = None
@@ -107,31 +108,23 @@ class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
             )
 
     async def _fetch(self) -> None:
-        today = dt_util.now(_TZ).date()
-        dobowe = await self.client.odczyty_dobowe(
-            self.podmiot, self.punkt, today - timedelta(days=40), today
-        )
-        if dobowe:
-            ostatni = max(dobowe, key=lambda o: o.data)
-            self._data.zuzycie_dobowe = ostatni.zuzycie
-            self._data.zuzycie_dobowe_dzien = ostatni.data.date()
-            self._data.licznik = ostatni.licznik
-            if self._data.stan_wodomierza_czas is None or (
-                _to_utc(ostatni.data) > self._data.stan_wodomierza_czas
-            ):
-                self._data.stan_wodomierza = ostatni.wskazanie
-                self._data.stan_wodomierza_czas = _to_utc(ostatni.data)
-        await self._import_hourly(today)
+        await self._import_hourly(dt_util.now(_TZ).date())
 
     async def _import_hourly(self, today: date) -> None:
-        """Dopisuje nowe godziny do statystyk zewnętrznych (panel Energia -> Woda)."""
+        """Dopisuje nowe godziny do statystyk zewnętrznych (panel Energia -> Woda).
+
+        Przy okazji aktualizuje wartości sensorów. Zużycie dobowe liczymy z odczytów
+        godzinowych, bo ostatni wpis endpointu dobowego bywa zerowy, dopóki nie dotrą
+        dane godzinowe. Doba w eBOK trwa od 23:00 dnia poprzedniego do 23:00.
+        """
         last = await get_instance(self.hass).async_add_executor_job(
             get_last_statistics, self.hass, 1, self.statistic_id, True, {"sum"}
         )
         if rows := last.get(self.statistic_id):
             last_start: datetime | None = dt_util.utc_from_timestamp(rows[0]["start"])
             total = rows[0]["sum"] or 0.0
-            day = (last_start + timedelta(hours=1)).astimezone(_TZ).date()
+            # o dzień wcześniej, żeby po restarcie odtworzyć ostatnią pełną dobę
+            day = (last_start + timedelta(hours=1)).astimezone(_TZ).date() - timedelta(days=1)
         else:
             last_start = None
             total = 0.0
@@ -144,6 +137,15 @@ class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
             odczyty = await self.client.odczyty_godzinowe(self.podmiot, self.punkt, day)
             if not odczyty and (today - day).days < DATA_DELAY_DAYS:
                 break  # dane z tego dnia jeszcze nie dotarły - spróbujemy później
+            # pierwszy odczyt to 23:00 dnia poprzedniego - należy do poprzedniej doby
+            doba = [o for o in odczyty if o.data.date() == day]
+            if doba:
+                self._data.ostatni_dzien = day
+                if any(o.data.hour == 23 for o in doba):  # doba pełna (do 23:00)
+                    self._data.zuzycie_dobowe = round(
+                        sum(o.zuzycie for o in doba if o.zuzycie is not None), 3
+                    )
+                    self._data.zuzycie_dobowe_dzien = day
             for o in odczyty:
                 end = _to_utc(o.data)
                 if prev_end and end <= prev_end:
@@ -152,20 +154,19 @@ class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
                     if end <= prev_end:
                         continue  # duplikat (np. 23:00 dnia poprzedniego)
                 prev_end = end
-                start = end - timedelta(hours=1)
-                if (last_start and start <= last_start) or o.zuzycie is None:
+                if o.zuzycie is None:
                     continue
-                total = round(total + o.zuzycie, 3)
-                stats.append(StatisticData(start=start, state=o.wskazanie, sum=total))
                 self._data.ostatnia_godzina = end
                 self._data.zuzycie_ostatniej_godziny = o.zuzycie
                 self._data.licznik = o.licznik or self._data.licznik
-                if o.wskazanie is not None and (
-                    self._data.stan_wodomierza_czas is None
-                    or end >= self._data.stan_wodomierza_czas
-                ):
+                if o.wskazanie is not None:
                     self._data.stan_wodomierza = o.wskazanie
                     self._data.stan_wodomierza_czas = end
+                start = end - timedelta(hours=1)
+                if last_start and start <= last_start:
+                    continue  # już zaimportowane
+                total = round(total + o.zuzycie, 3)
+                stats.append(StatisticData(start=start, state=o.wskazanie, sum=total))
             day += timedelta(days=1)
             await asyncio.sleep(0.3)  # nie zasypujemy eBOK zapytaniami przy backfillu
 

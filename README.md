@@ -1,5 +1,7 @@
 # MPWiK Wrocław (eBOK) dla Home Assistant
 
+<img src="custom_components/mpwik_wroclaw/brand/icon.png" width="96" alt="Ikona">
+
 Niestandardowa integracja Home Assistant (instalowana przez HACS), która pobiera **godzinowe zużycie wody**
 z [eBOK MPWiK Wrocław](https://ebok.mpwik.wroc.pl) i importuje je do statystyk HA.
 Dzięki temu dane da się pokazać w panelu **Energia → Zużycie wody**.
@@ -10,9 +12,9 @@ Dzięki temu dane da się pokazać w panelu **Energia → Zużycie wody**.
   pod właściwą godzinę, mimo że eBOK publikuje dane z 2–3 dniowym opóźnieniem.
 - Sensory:
   - *Stan wodomierza* (m³, `total_increasing`)
-  - *Zużycie dobowe* za ostatni dzień z danymi
+  - *Zużycie dobowe* za ostatnią pełną dobę z danymi godzinowymi (doba eBOK: 23:00–23:00)
   - *Zużycie w ostatniej godzinie z danymi*
-  - *Ostatni odczyt godzinowy* (znacznik czasu)
+  - *Ostatni odczyt godzinowy* – data ostatniego dnia z danymi (godzina w atrybucie)
 
 ## Ważne: logowanie
 
@@ -51,6 +53,17 @@ pip install aiohttp
 ```bash
 MPWIK_COOKIE='JSESSIONID=...; SERVERG1=...' python3 tools/mpwik_fetch.py --podmiot 380281 --od 2026-10-01 --do 2026-10-15 -o zuzycie.csv
 ```
+
+## Ikona
+
+Ikona leży w `custom_components/mpwik_wroclaw/brand/` (nowsze wersje HA wczytują ją lokalnie; sprawdzone na 2026.10).
+Żeby ją wygenerować ponownie: `pip install pillow && python3 tools/make_icon.py`.
+
+## Historia zmian
+
+- **0.2.0** – ikona integracji, producent urządzenia „ML”; zużycie dobowe liczone z danych godzinowych
+  (ostatnia pełna doba 23:00–23:00, wcześniej bywało 0); „Ostatni odczyt godzinowy” pokazuje datę ostatniego dnia z danymi.
+- **0.1.0** – pierwsza wersja.
 
 ## Użyte API eBOK
 

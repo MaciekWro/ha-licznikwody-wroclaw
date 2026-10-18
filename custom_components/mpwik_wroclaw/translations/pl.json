@@ -37,7 +37,7 @@
   "entity": {
     "sensor": {
       "stan_wodomierza": { "name": "Stan wodomierza" },
-      "zuzycie_dobowe": { "name": "Zużycie dobowe (ostatni dzień z danymi)" },
+      "zuzycie_dobowe": { "name": "Zużycie dobowe (ostatnia pełna doba)" },
       "zuzycie_ostatniej_godziny": { "name": "Zużycie w ostatniej godzinie z danymi" },
       "ostatnia_godzina": { "name": "Ostatni odczyt godzinowy" }
     }

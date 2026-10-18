@@ -61,8 +61,9 @@ SENSORS: tuple[MpwikSensorDescription, ...] = (
     MpwikSensorDescription(
         key="ostatnia_godzina",
         translation_key="ostatnia_godzina",
-        device_class=SensorDeviceClass.TIMESTAMP,
-        value_fn=lambda d: d.ostatnia_godzina,
+        device_class=SensorDeviceClass.DATE,
+        value_fn=lambda d: d.ostatni_dzien,
+        attrs_fn=lambda d: {"koniec_ostatniej_godziny": d.ostatnia_godzina},
     ),
 )
 
@@ -88,7 +89,7 @@ class MpwikSensor(CoordinatorEntity[MpwikCoordinator], SensorEntity):
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, base_id)},
             name=f"Wodomierz {coordinator.config_entry.data.get(CONF_ADRES, coordinator.punkt)}",
-            manufacturer="MPWiK Wrocław",
+            manufacturer="ML",
             model=f"Punkt {coordinator.punkt}",
             entry_type=DeviceEntryType.SERVICE,
             configuration_url=f"https://ebok.mpwik.wroc.pl/trust/zuzycie-wody?p={coordinator.podmiot}",
