@@ -18,7 +18,7 @@ import sys
 from datetime import date, timedelta
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "custom_components" / "mpwik_wroclaw"))
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "custom_components" / "licznik_wody_wroclaw"))
 
 import aiohttp  # noqa: E402
 

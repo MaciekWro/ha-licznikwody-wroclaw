@@ -15,13 +15,12 @@ from homeassistant.components.sensor import (
 )
 from homeassistant.const import UnitOfVolume
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from . import MpwikConfigEntry
-from .const import CONF_ADRES, DOMAIN, REMOVED_SENSOR_KEYS
+from .const import CONF_ADRES, DOMAIN
 from .coordinator import MpwikCoordinator, MpwikData
 
 
@@ -78,11 +77,6 @@ async def async_setup_entry(
     async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
     coordinator = entry.runtime_data
-    registry = er.async_get(hass)
-    base_id = f"{coordinator.podmiot}_{coordinator.punkt}"
-    for key in REMOVED_SENSOR_KEYS:
-        if entity_id := registry.async_get_entity_id("sensor", DOMAIN, f"{base_id}_{key}"):
-            registry.async_remove(entity_id)
     async_add_entities(MpwikSensor(coordinator, description) for description in SENSORS)
 
 

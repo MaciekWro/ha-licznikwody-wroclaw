@@ -1,6 +1,6 @@
 # Licznik wody Wrocław – integracja Home Assistant
 
-<img src="custom_components/mpwik_wroclaw/brand/icon.png" width="96" alt="Ikona">
+<img src="custom_components/licznik_wody_wroclaw/brand/icon.png" width="96" alt="Ikona">
 
 Niestandardowa integracja Home Assistant (instalowana przez HACS), która pobiera **godzinowe zużycie wody**
 z [eBOK MPWiK Wrocław](https://ebok.mpwik.wroc.pl) i importuje je do statystyk HA.
@@ -8,7 +8,7 @@ Dzięki temu dane da się pokazać w panelu **Energia → Zużycie wody**.
 
 ## Co dostajesz
 
-- **Statystykę zewnętrzną** `mpwik_wroclaw:<podmiot>_<punkt>` z godzinowym zużyciem (m³). Każde zużycie trafia
+- **Statystykę zewnętrzną** `licznik_wody_wroclaw:<podmiot>_<punkt>` z godzinowym zużyciem (m³). Każde zużycie trafia
   pod właściwą godzinę, mimo że eBOK publikuje dane z 2–3 dniowym opóźnieniem.
 - Sensory:
   - *Stan wodomierza* (m³, `total_increasing`)
@@ -41,9 +41,9 @@ uwierzytelnieniu i wystarczy wkleić nowe ciasteczko.
 3. *Ustawienia → Urządzenia i usługi → Dodaj integrację → Licznik wody Wrocław*.
 4. Podaj **kod podmiotu** (liczba z parametru `?p=` w adresie eBOK), nagłówek `Cookie` oraz liczbę dni historii do pobrania.
 5. Wybierz punkt sieci (wodomierz).
-6. *Ustawienia → Panele → Energia → Zużycie wody → Dodaj źródło wody* i wybierz statystykę **MPWiK …**.
+6. *Ustawienia → Panele → Energia → Zużycie wody → Dodaj źródło wody* i wybierz statystykę **Licznik wody …**.
 
-Instalacja ręczna: skopiuj katalog `custom_components/mpwik_wroclaw` do `config/custom_components/`.
+Instalacja ręczna: skopiuj katalog `custom_components/licznik_wody_wroclaw` do `config/custom_components/`.
 
 ## Samodzielny skrypt (bez Home Assistant)
 
@@ -57,11 +57,13 @@ MPWIK_COOKIE='JSESSIONID=...; SERVERG1=...' python3 tools/mpwik_fetch.py --podmi
 
 ## Ikona
 
-Ikona leży w `custom_components/mpwik_wroclaw/brand/` (nowsze wersje HA wczytują ją lokalnie; sprawdzone na 2026.10).
+Ikona leży w `custom_components/licznik_wody_wroclaw/brand/` (nowsze wersje HA wczytują ją lokalnie; sprawdzone na 2026.10).
 Żeby ją wygenerować ponownie: `pip install pillow && python3 tools/make_icon.py`.
 
 ## Historia zmian
 
+- **0.4.0** – identyfikator integracji zmieniony na `licznik_wody_wroclaw` (zmiana łamiąca zgodność):
+  po aktualizacji usuń starą integrację, dodaj ją od nowa i wybierz nową statystykę w panelu Energia.
 - **0.3.0** – nazwa „Licznik wody Wrocław”; „Ostatni odczyt godzinowy” pokazuje datę i godzinę;
   nowe encje „Dzienne zużycie wody” i „Godzinowe zużycie wody” (zastępują dwie poprzednie encje zużycia).
 - **0.2.0** – ikona integracji, producent urządzenia „ML”; zużycie dobowe liczone z danych godzinowych

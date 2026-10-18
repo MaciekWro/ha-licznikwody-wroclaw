@@ -173,7 +173,7 @@ class MpwikCoordinator(DataUpdateCoordinator[MpwikData]):
         metadata = StatisticMetaData(
             mean_type=StatisticMeanType.NONE,
             has_sum=True,
-            name=f"MPWiK {self.config_entry.data.get(CONF_ADRES, self.punkt)}",
+            name=f"Licznik wody {self.config_entry.data.get(CONF_ADRES, self.punkt)}",
             source=DOMAIN,
             statistic_id=self.statistic_id,
             unit_class=VolumeConverter.UNIT_CLASS,

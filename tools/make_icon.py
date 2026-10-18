@@ -14,7 +14,7 @@ from PIL import Image, ImageDraw
 SIZE = 2048  # rysujemy w dużej rozdzielczości i zmniejszamy - gładkie krawędzie
 TOP = (79, 195, 247)  # #4FC3F7
 BOTTOM = (2, 119, 189)  # #0277BD
-OUT = Path(__file__).resolve().parent.parent / "custom_components" / "mpwik_wroclaw" / "brand"
+OUT = Path(__file__).resolve().parent.parent / "custom_components" / "licznik_wody_wroclaw" / "brand"
 
 
 def drop_polygon(cx: float, cy: float, r: float, tip_dist: float) -> list[tuple[float, float]]:
