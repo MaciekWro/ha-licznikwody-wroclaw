@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "MPWiK Wrocław (eBOK)",
+        "description": "eBOK login requires reCAPTCHA, so this integration uses a browser session. Log in at ebok.mpwik.wroc.pl, open developer tools (F12) → Network, select any request to frontend-api and copy the full value of the Cookie request header.",
+        "data": {
+          "podmiot": "Customer code",
+          "cookie": "Cookie header",
+          "backfill_days": "Days of history to import on first run"
+        },
+        "data_description": {
+          "podmiot": "Number from the ?p= parameter in the eBOK URL, e.g. 380281",
+          "cookie": "E.g. JSESSIONID=...; SERVERG1=...; visid_incap_...=..."
+        }
+      },
+      "punkt": {
+        "title": "Select service point",
+        "data": { "punkt": "Service point" }
+      },
+      "reauth_confirm": {
+        "title": "eBOK session expired",
+        "description": "Log in again in your browser and paste the new Cookie header.",
+        "data": { "cookie": "Cookie header" }
+      }
+    },
+    "error": {
+      "invalid_auth": "Session is not logged in - check the cookie.",
+      "cannot_connect": "Cannot connect to eBOK.",
+      "no_points": "No active service points for this customer."
+    },
+    "abort": {
+      "already_configured": "This service point is already configured.",
+      "reauth_successful": "Session renewed."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stan_wodomierza": { "name": "Meter reading" },
+      "zuzycie_dobowe": { "name": "Daily usage (latest day with data)" },
+      "zuzycie_ostatniej_godziny": { "name": "Usage in latest hour with data" },
+      "ostatnia_godzina": { "name": "Latest hourly reading" }
+    }
+  }
+}

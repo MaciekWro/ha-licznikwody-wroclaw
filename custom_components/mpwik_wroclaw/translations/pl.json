@@ -1,0 +1,45 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "MPWiK Wrocław (eBOK)",
+        "description": "Logowanie do eBOK wymaga reCAPTCHA, dlatego integracja używa sesji z przeglądarki. Zaloguj się na ebok.mpwik.wroc.pl, otwórz narzędzia deweloperskie (F12) → Sieć, kliknij dowolne zapytanie do frontend-api i skopiuj całą wartość nagłówka Cookie.",
+        "data": {
+          "podmiot": "Kod podmiotu",
+          "cookie": "Nagłówek Cookie",
+          "backfill_days": "Ile dni historii pobrać przy pierwszym uruchomieniu"
+        },
+        "data_description": {
+          "podmiot": "Liczba z parametru ?p= w adresie eBOK, np. 380281",
+          "cookie": "Np. JSESSIONID=...; SERVERG1=...; visid_incap_...=..."
+        }
+      },
+      "punkt": {
+        "title": "Wybierz punkt sieci",
+        "data": { "punkt": "Punkt sieci" }
+      },
+      "reauth_confirm": {
+        "title": "Sesja eBOK wygasła",
+        "description": "Zaloguj się ponownie w przeglądarce i wklej nowy nagłówek Cookie.",
+        "data": { "cookie": "Nagłówek Cookie" }
+      }
+    },
+    "error": {
+      "invalid_auth": "Sesja nie jest zalogowana - sprawdź ciasteczko.",
+      "cannot_connect": "Nie można połączyć się z eBOK.",
+      "no_points": "Brak aktywnych punktów sieci dla tego podmiotu."
+    },
+    "abort": {
+      "already_configured": "Ten punkt jest już skonfigurowany.",
+      "reauth_successful": "Sesja odnowiona."
+    }
+  },
+  "entity": {
+    "sensor": {
+      "stan_wodomierza": { "name": "Stan wodomierza" },
+      "zuzycie_dobowe": { "name": "Zużycie dobowe (ostatni dzień z danymi)" },
+      "zuzycie_ostatniej_godziny": { "name": "Zużycie w ostatniej godzinie z danymi" },
+      "ostatnia_godzina": { "name": "Ostatni odczyt godzinowy" }
+    }
+  }
+}
